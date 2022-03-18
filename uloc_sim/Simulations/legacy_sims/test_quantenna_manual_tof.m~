@@ -1,0 +1,40 @@
+load /media/ehdd_2t/roshan_data/datasets/raisedbot_quantenna/channels/channels_grndfloor_raisedbot2.mat
+[n_points,n_lambda,n_ant,n_ap] = size(channels);
+d_vals = -10:0.1:10;
+theta_vals = -pi/2:0.01:pi/2;
+d1 = -4.5:0.2:13.5;
+d2 = -2.5:0.2:7.5;
+
+opt.freq = 5e9 + 5*153*1e6 + [-117:-1,1:117].*80.*1e6./256;
+opt.lambda = 3e8./opt.freq;
+opt.threshold = 0.05;
+opt.ant_sep = 0.0259;
+
+for i=1
+    for j=1
+        P = compute_spotfi_profile_edit2(squeeze(channels_comp_nts(i,:,:,j)),theta_vals,d_vals,opt);
+        P_out = convert_spotfi_to_2d(P,theta_vals,d_vals,d1,d2,ap{j});
+        figure(1),subplot(321), imagesc(d_vals,theta_vals*180/pi,abs(P)), axis xy, title('MUSIC'),xlabel('ToF (meters)'), ylabel('AoA (degrees)');
+        subplot(322), imagesc(d1,d2,abs(P_out)), axis xy, hold on, scatter(cli_pos(i,1),cli_pos(i,2),'r','filled'), hold off,xlabel('X (meters)'), ylabel('Y (meters)');
+        
+        P1 = compute_multipath_profile2d_fast_edit(squeeze(channels_comp_nts(i,:,:,j)),theta_vals,d_vals,opt);
+        img = abs(P1);
+        img = (img-min(img(:)))./(max(img(:))-min(img(:)));  nel = strel('disk',4,8);
+        [thresh, em] = graythresh(img);
+        P1_new = P1.*double(imbinarize(img,thresh*em));
+        
+        P_bw = imregionalmax(abs(P))
+        P1_new_bw = imregionalmax((P1_new)
+        
+        P1_out = convert_spotfi_to_2d(P1,theta_vals,d_vals,d1,d2,ap{j});
+        P1_out_new = convert_spotfi_to_2d(P1_new,theta_vals,d_vals,d1,d2,ap{j});
+        
+        subplot(323), imagesc(d_vals,theta_vals*180/pi,abs(P1)), axis xy, title('2D FFT'),xlabel('ToF (meters)'), ylabel('AoA (degrees)');
+        subplot(324), imagesc(d1,d2,abs(P1_out)), axis xy, hold on, scatter(cli_pos(i,1),cli_pos(i,2),'r','filled'), hold off,xlabel('X (meters)'), ylabel('Y (meters)');
+        
+        subplot(325), imagesc(d_vals,theta_vals*180/pi,abs(P1_new)), axis xy, title('2D FFT w/ i image thresholding'),xlabel('ToF (meters)'), ylabel('AoA (degrees)');
+        subplot(326), imagesc(d1,d2,abs(P1_out_new)), axis xy, hold on, scatter(cli_pos(i,1),cli_pos(i,2),'r','filled'), hold off,xlabel('X (meters)'), ylabel('Y (meters)');
+        
+        waitforbuttonpress;
+    end
+end

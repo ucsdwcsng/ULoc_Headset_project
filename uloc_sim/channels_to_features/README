@@ -1,0 +1,4 @@
+All the matlab files which are named:
+convert* : These codes convert eh channels, either created by simulations or extracted from real worl into features. The features generated are described in the naming of those files and the functions that they use which are named 'generate*'
+
+generate*: These are the various functions called to generate the above metnioed features.
