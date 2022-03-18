@@ -15,7 +15,7 @@ c = 3e8;
 opt.freq = 4.4928e9;%6489.6e6;
 opt.lambda = c./opt.freq;
 opt.ant_sep = opt.lambda/2;
-radius = 2/8 * opt.lambda; % Closest Antennas can be placed together
+%radius = 2/8 * opt.lambda;
 
 W = [cos(tp(:,2)).*cos(tp(:,1)), sin(tp(:,2)), cos(tp(:,2)).*sin(tp(:,1))];
 

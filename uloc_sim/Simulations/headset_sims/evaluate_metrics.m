@@ -1,8 +1,7 @@
 %% Evaluate metrics from headset_sim
 % Given saved mat files for "metrics" and "array" from headset_sim.m:
 clearvars
-root_folder = 'C:/Users/tyler/Desktop/ULoc_Headset_project';
-dir = [root_folder,'/uloc_sim/Simulations/headset_sims/metrics/'];
+dir = ['metrics/'];
 
 m{1} = load([dir,'axial_3-17.mat']);
 m{2} = load([dir,'zz_3-17.mat']);
