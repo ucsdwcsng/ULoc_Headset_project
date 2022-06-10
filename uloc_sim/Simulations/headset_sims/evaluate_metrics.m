@@ -41,7 +41,7 @@ subplot(2,2,3)
 grid on; grid minor; title('Close Peak AoA(Theta) Error'); xlabel('Theta Err (\circ)');ylim([0,1]);xlim([0,60]);
 legend(labels_prct3)
 subplot(2,2,4)
-grid on; grid minor; title('Close Peak AoA(Phi) Error'); xlabel('Phi normed Err (\circ)');ylim([0,1]);xlim([0,60]);
+grid on; grid minor; title('Close Peak AoA(Phi) Error'); xlabel('Phi Err (\circ)');ylim([0,1]);xlim([0,60]);
 legend(labels_prct4)
 
 %% Num Peaks

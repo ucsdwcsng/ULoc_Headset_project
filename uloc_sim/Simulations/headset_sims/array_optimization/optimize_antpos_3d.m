@@ -63,7 +63,7 @@ disp(iN)
 end
 
 %% Apply Kovarik's
-if false
+if true
     X = exp(1j*2.*pi./opt.lambda.*W*x);
     Ak = X;
     I = eye(size(Ak,1));

@@ -85,10 +85,14 @@ for i = 1:length(ap)
         dst = [dst; -ant_sep*iant,0,0;...
                     0,-ant_sep*iant,0;...
                     0,0,-ant_sep*iant];
-    end   
+    end
+    dst = [dst; -ant_sep*4,0,0];
+    dst = [dst; 0,-ant_sep*4,0];
+    dst = [dst; 0,0,-ant_sep*4];
+    
     dst = dst-mean(dst);
     array.local_ants{i} = dst;
-    array.RX_ANT_NUM = (n_ants-1)*3+1;
+    array.RX_ANT_NUM = size(dst,1);
     %}
     
     elseif arrtype == 6

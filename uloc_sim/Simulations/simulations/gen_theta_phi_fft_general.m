@@ -1,4 +1,4 @@
-function [P,A] = gen_theta_phi_fft_general(H, THETA_VALS, PHI_VALS, opt, ant_pos, plt_profile)
+function [P,A,dt] = gen_theta_phi_fft_general(H, THETA_VALS, PHI_VALS, opt, ant_pos, plt_profile)
 
 	% H = Complex channel, [N_ant x 1]
 	% THETA_VALS, PHI_VALS = search space of theta and phi values, [1 x N_angles], 
@@ -40,7 +40,7 @@ function [P,A] = gen_theta_phi_fft_general(H, THETA_VALS, PHI_VALS, opt, ant_pos
 %     		P(ii, jj) = dot(H, steering_vec);
 %     	end
 %     end
-    
+    tic % Start Timer
     for jj=1:length(PHI_VALS)
         th = THETA_VALS;
         phi = PHI_VALS(jj);
@@ -51,5 +51,5 @@ function [P,A] = gen_theta_phi_fft_general(H, THETA_VALS, PHI_VALS, opt, ant_pos
         %[~,A(:, jj)] = min(a,[],2);
         %A(:,jj,:) = a;
     end
-    
+    dt = toc; % End Timer
 end

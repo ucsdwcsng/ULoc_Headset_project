@@ -12,7 +12,7 @@ function S = gen_auto_corr_steering(THETA_VALS, PHI_VALS, opt, ant_pos)
 	% 			where l = antenna spacing
 
 	%P = zeros(size(THETA_VALS,2)* size(PHI_VALS,2), size(ant_pos,2));
-	const = 1j*2*pi/opt.lambda;
+	const = 1j*2*pi/mean(opt.lambda);
     P = [];
     t_sv = [];
     p_sv = [];

@@ -1,5 +1,5 @@
 clearvars
-close all
+%close all
 
 root_folder = 'C:/users/tyler/Desktop/ULoc_Headset_project/';
 addpath([root_folder,'uloc_sim/Simulations/simulations'])
@@ -8,8 +8,8 @@ addpath([root_folder,'uloc_sim/Simulations/legacy_sims'])
 %% Define global constants
 
 %pause('on')
-theta_step = deg2rad(1);%0.01;
-THETA_VALS = -deg2rad(180):theta_step:deg2rad(180); % aoa values for FFT
+theta_step = deg2rad(3);%0.01;
+THETA_VALS = -deg2rad(90):theta_step:deg2rad(90); % aoa values for FFT
 PHI_VALS = -deg2rad(90):theta_step:deg2rad(90);
 
 % define opt
@@ -20,6 +20,7 @@ opt.cent_lambda = c./opt.cent_freq;
 opt.lambda = c./opt.freq;
 %opt.ant_sep = 33.364e-3;
 opt.ant_sep = opt.cent_lambda/2;
+runtime = 0;
 
 zeroFreq = mean(opt.freq);
 % Time Resolution: If multipath arrives later than this time res relative 
@@ -74,12 +75,12 @@ load([root_folder,'uloc_sim/Simulations/headset_sims/body_space.mat']);
 %src = src_center;
 
 n_init_ants = 4; % In the case of 3D options (5,6), n_init_ants is antennas per "axis". ie. 4 gives 10 total
-arrtype = 9; % Select 5 for 3D-Axial, 6 for 3D-ZigZag, 9 to load in custom
+arrtype = 3; % Select 5 for 3D-Axial, 6 for 3D-ZigZag, 9 to load in custom
 % ArrTypes:
 % Circular: 1, Coprime: 2, L: 3, Decahex: 4, 3D-Axial: 5 (n_init_ants refers to # antennas along each axis),
 % 3D-ZigZag: 6, Optimized: 9 (From optimize_antpos_3d.m)
 plt_env = true; % Plot Environment after simulation
-plt_profile = false; % Plot AoA and Range per packet
+plt_profile = true; % Plot AoA and Range per packet
 ant_power = false; % Antenna power characterization (TODO)
 recordVideo = false;
 gen_path = true; % Use path from body_space.mat
@@ -112,6 +113,7 @@ end
 % Generate a path for the src, or default to wherever src was placed
 if gen_path
      path = gt_data;
+     path = path(1:500,:);
      if moving_head
          ap_locs = [0.5*(rand(length(path),1)-0.5)+path(:,1),...
                     mean(path(:,2))*ones(length(path),1),...
@@ -197,8 +199,9 @@ for iap = 1:length(ap) % Only 1 AP currently, loop unecessary
     end
     
     % Generate AoA Profile
-    [P,A] = gen_theta_phi_fft_general(H, THETA_VALS, PHI_VALS, opt, array.local_ants{iap}.',plt_profile);
-    
+    %[P,A,dt] = gen_theta_phi_fft_general(H, THETA_VALS, PHI_VALS, opt, array.local_ants{iap}.',plt_profile);
+    [P,dt] = gen_theta_phi_music_general(H, THETA_VALS, PHI_VALS, opt, array.local_ants{iap}.',1,plt_profile);
+    runtime = runtime + dt;
     [tmp, tmax] = max(abs(P));
     [~, pmax] = max(tmp);
     aoa_pred = [rad2deg(THETA_VALS(tmax(pmax))), rad2deg(PHI_VALS(pmax))];
@@ -314,7 +317,7 @@ else
     metrics.min_dist(it) = 0;
 end
 end % End Loop for 1 iteration
-
+runtime = runtime ./totallen;
 if recordVideo
     close(v);
 end

@@ -1,4 +1,4 @@
-function P = gen_theta_phi_music_general(H, THETA_VALS, PHI_VALS, opt, ant_pos, n_sigs)
+function [P,dt] = gen_theta_phi_music_general(H, THETA_VALS, PHI_VALS, opt, ant_pos, n_sigs, plt_profile)
 
 	% H = Complex channel, [N_ant x 1]
 	% THETA_VALS, PHI_VALS = search space of theta and phi values, [1 x N_angles], 
@@ -13,13 +13,25 @@ function P = gen_theta_phi_music_general(H, THETA_VALS, PHI_VALS, opt, ant_pos, 
     coprime = false;
     if ~coprime
         P = zeros(size(THETA_VALS,2), size(PHI_VALS,2));
-        const = 1j*2*pi/opt.lambda;
-
-        aH = H*H'./size(H,2); % TODO: Time average over n_ant times instances, increase rank of aH
+        d_vals = 0:0.01:10;
+        cir = H*exp(1j*2*pi*d_vals./opt.lambda.');
+        [~,taps] = max(abs(cir),[],2);
+        taps = floor(median(taps));
+        CIR_t = cir(:,taps);
+        if plt_profile
+            figure(1);subplot(1,2,2)
+            plot(d_vals,abs(cir.'))
+            title('CIR'); grid on; grid minor
+        end
+        Ht = CIR_t;
+        const = 1j*2*pi/opt.cent_lambda;
+        
+        tic % Start Timer
+        aH = Ht*Ht';%./size(H,2); % TODO: Time average over n_ant times instances, increase rank of aH
         [v,d] = eig(aH);
         [~,idx] = sort(ones(1,size(d,1))*abs(d));
         v = v(:,idx);
-        %n_sigs = 3;
+        n_sigs = length(find(diag(d)>0.1*max(diag(d))));
         for jj=1:length(PHI_VALS)
             th = THETA_VALS;
             phi = PHI_VALS(jj);
@@ -27,6 +39,7 @@ function P = gen_theta_phi_music_general(H, THETA_VALS, PHI_VALS, opt, ant_pos, 
             steering_vec = exp(wave_vec.' * ant_pos);%exp(dot(wave_vec, ant_pos)).';
             P(:,jj) = 1./( sum(abs(conj(steering_vec) * v(:,[1:size(d,1)-n_sigs])).^2, 2) );
         end
+        dt = toc; % End Timer
         
 %         for jj=1:length(THETA_VALS)
 %             th = THETA_VALS(jj);
